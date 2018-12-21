@@ -45,25 +45,20 @@ export default {
   },
   methods: {
     loginHandler: function (formName) {
-      let self = this
       this.$refs[formName].validate((valid) => {
         if (valid) {
           // 发送用户信息到后台
-          self.$http.post('/login',
-            {username: self.ruleForm.username, password: self.ruleForm.password})
-            .then(function (result) {
+          this.$http.post('/login', {...this.ruleForm})
+            .then(res => {
+              let token = res.token
               // 设置token
-              console.log('token: ', result.data.token)
-              self.$http.defaults.headers.common['Authorization'] = result.data.token
-              self.$router.push({path: 'home'})
-            }).catch(function (err) {
-              self.$message({
-                message: err.data.message,
-                type: 'error'
-              })
+              this.$http.defaults.headers.common['Authorization'] = token
+              // 本地保存token
+              this.saveToken(token)
+              this.$router.push({path: 'home'})
             })
         } else {
-          self.$message({
+          this.$message({
             message: '必填项不能为空',
             type: 'warning'
           })
@@ -71,32 +66,29 @@ export default {
       })
     },
     registerHandler: function (formName) {
-      let self = this
       this.$refs[formName].validate((valid) => {
         if (valid) {
           // 发送注册信息到后台
-          self.$http.post('/register',
-            {username: self.ruleForm.username, password: self.ruleForm.password})
-            .then(function (result) {
-              self.$message({
+          this.$http.post('/register', {...this.ruleForm})
+            .then(res => {
+              this.$message({
                 message: '注册成功',
                 type: 'success'
               })
-              console.log('register result: ', result)
-              self.setCur('login')
-            }).catch(function (err) {
-              self.$message({
-                message: err.data.message,
-                type: 'error'
-              })
+              this.setCur('login')
             })
         } else {
-          self.$message({
+          this.$message({
             message: '必填项不能为空',
             type: 'warning'
           })
         }
       })
+    },
+    saveToken: function (token) {
+      if (window.sessionStorage) {
+        sessionStorage.setItem('token', token)
+      }
     },
     resetHandler: function (formName) {
       this.$refs[formName].resetFields()

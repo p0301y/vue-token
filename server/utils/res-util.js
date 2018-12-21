@@ -7,3 +7,4 @@ exports.resModel = function (obj) {
     ...obj
   }
 }
+

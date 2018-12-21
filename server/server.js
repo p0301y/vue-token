@@ -5,6 +5,7 @@ const bodyParser = require('koa-bodyparser')
 const mock = require('./mock/users')
 const jwt = require('./utils/token-util')
 const resModel = require('./utils/res-util').resModel
+const createX = require('./utils/util').createX
 
 const app = new Koa()
 let router = new Router({
@@ -60,9 +61,25 @@ router.post('/login', async (ctx) => {
 
 // 首页
 router.get('/home', async (ctx) => {
+  // let obj = await new Promise((resolve, reject) => {
+  //   setTimeout(() => {
+  //        resolve(resModel({content: 'welcome to home page!'}))
+  //     }, 1000)
+  // })
+  // console.log('obj: ', obj)
+  // ctx.body = obj
   ctx.body = resModel({content: 'welcome to home page!'})
+})
+
+router.get('/chart', async (ctx) => {
+  let { chartId, num } = ctx
+
+  // let arr = await createX(num)
+  let arr = createX(num)
+  ctx.body = resModel({arr: arr})
 })
 
 app.listen(8999, () => {
   console.log('koa starts at port 8999')
 })
+
